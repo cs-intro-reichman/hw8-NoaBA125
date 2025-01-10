@@ -30,9 +30,11 @@ public class Network {
      *  Notice that the method receives a String, and returns a User object. */
     public User getUser(String name) {
         for (int i = 0; i < userCount; i++) {
+            if (users[i] != null) {
             if (users[i].getName().equals(name)) {
                 return users[i];
             }
+        }
         }
         return null;
     }
@@ -43,7 +45,9 @@ public class Network {
     *  Otherwise, creates a new user with the given name, adds the user to this network, and returns true. */
     public boolean addUser(String name) {
         if (userCount < users.length && getUser(name) == null) {
-            this.users[userCount] = new User(name);
+            users[userCount] = new User(name);
+            userCount++;
+            return true;
         }
         return false;
     }
@@ -52,11 +56,13 @@ public class Network {
      *  If any of the two names is not a user in this network,
      *  or if the "follows" addition failed for some reason, returns false. */
     public boolean addFollowee(String name1, String name2) {
+        if (name1 != null && name2 != null) {
         if (getUser(name1) != null && getUser(name2) != null) {
-            if (getUser(name1).addFollowee(name2)) {
-                return true;
+            if (!name1.toLowerCase().equals(name2.toLowerCase())) {
+                return getUser(name1).addFollowee(name2);
             }
         }
+    }
         return false;
     }
     
@@ -65,16 +71,18 @@ public class Network {
     public String recommendWhoToFollow(String name) {
         User mostRecommended = null;
         int max = -1;
-
+        if (getUser(name) != null) {
         for (int i = 0; i < userCount; i++) {
+        
             if (users[i].getName().equals(name)) {
                 continue;
             }
             int count = getUser(name).countMutual(users[i]);
-            if (max < count) {
+            if (count > max) {
                 max = count;
                 mostRecommended = users[i];
             }
+        }
         }
         return mostRecommended != null ? mostRecommended.getName() : null;
     }
@@ -85,11 +93,13 @@ public class Network {
         User mostPopular = null;
         int max = 0;
         for(int i = 0; i < userCount; i++) {
+            if (users[i] != null) {
             int count = followeeCount(users[i].getName());
-            if (max < count) {
+            if (count > max) {
                 max = count;
                 mostPopular = users[i];
-            }
+            } 
+        }
         }
         return mostPopular != null ? mostPopular.getName() : null;
     }
